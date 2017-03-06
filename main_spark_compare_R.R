@@ -9,16 +9,16 @@
 # Douglas Fletcher
 # ==========================================
 
-# local
-.libPaths(c(file.path(Sys.getenv("R_LIBS_USER")), .libPaths()))
-
+# global vars
+if(!exists("DIRLOC")){
+	DIRLOC <- getwd()
+}
 
 # global vars
-DIRLOC <- "C:/Users/douglas.fletcher/Documents/projects/creditscore_spark/"
-TRAINING <- paste0(DIRLOC,"01_data/cstraining_kaggle.csv")
+TRAINING <- paste0(DIRLOC,"/in/cstraining_kaggle.csv")
 
 # read sparkR setup
-source(paste0(DIRLOC,"creditscoring_R/sparkRSetup.R"))
+source(paste0(DIRLOC,"/sparkRSetup.R"))
 options(scipen=999)
 
 # libraries
@@ -29,7 +29,6 @@ library(SparkR)
 library(magrittr)
 
 # system tasks
-registerDoMC(cores=4)
 sparkR.session(master="local[*]"
 	, appName="appName"
 	, sparkConfig = list(
@@ -38,12 +37,11 @@ sparkR.session(master="local[*]"
 )
 
 # functions
-source(paste0(DIRLOC,"creditscoring_R/dataprep_model_functions.R"))
+source(paste0(DIRLOC,"/dataprep_model_functions.R"))
 
 #===================
 # prepare input data
 #===================
-
 prepSparkDataset <- function(DATAIN){
 	# ==============================
 	# purpose: prep model data spark
@@ -104,4 +102,3 @@ ptm <- proc.time()
 rSparkRandOutput <- sparkRRandomForest(testsTransSparkNonNAs)
 print("timing sparkR randomForest: ")
 print(proc.time() - ptm)
-
